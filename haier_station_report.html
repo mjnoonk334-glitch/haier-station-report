@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام تقارير محطة الحاير</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #0F6E56;
+      --primary-light: #1D9E75;
+      --primary-lighter: #E1F5EE;
+      --secondary: #185FA5;
+      --danger: #E24B4A;
+      --success: #639922;
+      --warning: #BA7517;
+      --dark: #1a1a1a;
+      --light: #f5f5f5;
+      --border: #d0d0d0;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666;
+      --bg-light: #fafafa;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+      color: var(--text-primary);
+      direction: rtl;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navigation */
+    .navbar {
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      padding: 1rem 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .navbar-brand {
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .navbar-menu {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .navbar-menu button {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .navbar-menu button:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    /* Main Container */
+    .main-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: white;
+      border-left: 1px solid var(--border);
+      padding: 1.5rem;
+      overflow-y: auto;
+      box-shadow: inset -2px 0 6px rgba(0,0,0,0.02);
+    }
+
+    .sidebar-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .sidebar-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--primary-lighter);
+    }
+
+    .report-list {
+      list-style: none;
+    }
+
+    .report-item {
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: var(--bg-light);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .report-item:hover {
+      background: var(--primary-lighter);
+      border-left-color: var(--primary-light);
+      transform: translateX(4px);
+    }
+
+    .report-item.active {
+      background: var(--primary-lighter);
+      border-left-color: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .content-header {
+      background: white;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .content-header h1 {
+      font-size: 28px;
+      color: var(--primary);
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .stat-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .form-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+
+    .section {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 0.8rem;
+      border-bottom: 2px solid var(--primary-lighter);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Cairo', sans-serif;
+      background: white;
+      color: var(--text-primary);
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    table th {
+      background: linear-gradient(90deg, var(--primary-lighter) 0%, #d4f0e8 100%);
+      color: var(--primary);
+      font-weight: 600;
+      padding: 12px;
+      text-align: right;
+      border: 1px solid var(--border);
+    }
+
+    table td {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      text-align: right;
+    }
+
+    table tr:nth-child(even) {
+      background: rgba(31, 158, 117, 0.02);
+    }
+
+    table tr:hover {
+      background: rgba(31, 158, 117, 0.05);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-family: 'Cairo', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(15, 110, 86, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(15, 110, 86, 0.4);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary-lighter);
+    }
+
+    .btn-danger {
+      background: white;
+      color: var(--danger);
+      border: 2px solid var(--danger);
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .btn-danger:hover {
+      background: #ffebeb;
+    }
+
+    .btn-small {
+      background: var(--secondary);
+      color: white;
+      padding: 8px 12px;
+      font-size: 12px;
+      margin-top: 0.5rem;
+    }
+
+    .btn-small:hover {
+      background: #1a4a7f;
+    }
+
+    .footer-actions {
+      background: white;
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* Status Badge */
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-draft {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-submitted {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .status-approved {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-header {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--primary-lighter);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      justify-content: flex-end;
+    }
+
+    /* Success Message */
+    .success-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      animation: slideInRight 0.3s ease-out;
+      z-index: 2000;
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(400px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      .navbar, .sidebar, .footer-actions, .modal {
+        display: none;
+      }
+      
+      .main-container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .content-header {
+        border-bottom: 3px solid var(--primary);
+      }
+
+      .form-container {
+        padding: 0;
+      }
+
+      .section {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #999;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        border-left: none;
+        border-bottom: 1px solid var(--border);
+        padding: 1rem;
+      }
+
+      .main-container {
+        flex-direction: column;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .navbar {
+        padding: 1rem;
+      }
+
+      .navbar-brand {
+        font-size: 18px;
+      }
+
+      .navbar-menu {
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <div class="navbar">
+    <div class="navbar-brand">
+      💧 نظام تقارير محطة الحاير
+    </div>
+    <div class="navbar-menu">
+      <button onclick="showStatsModal()">📊 الإحصائيات</button>
+      <button onclick="showHelpModal()">❓ المساعدة</button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">التقارير</div>
+        <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="createNewReport()">+ تقرير جديد</button>
+        <ul class="report-list" id="reportsList"></ul>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">الإجراءات</div>
+        <button class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;" onclick="exportAllReports()">📥 تصدير الكل</button>
+        <button class="btn btn-danger" style="width: 100%; margin-top: 0.5rem;" onclick="clearAllData()">🗑️ حذف الكل</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="content-header">
+        <div>
+          <h1>تقرير جديد</h1>
+          <span id="reportStatus" class="status-badge status-draft">مسودة</span>
+        </div>
+        <div class="header-stats">
+          <div class="stat-card">
+            <div class="stat-label">التقارير المحفوظة</div>
+            <div class="stat-value" id="totalReports">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-container">
+        <!-- البيانات العامة -->
+        <div class="section">
+          <div class="section-title">📍 البيانات العامة</div>
+          <div class="grid">
+            <div class="form-group">
+              <label>التاريخ</label>
+              <input type="date" id="date" required>
+            </div>
+            <div class="form-group">
+              <label>الاستهلاك (MW/DAY)</label>
+              <input type="number" id="consumption" placeholder="0" min="0" step="0.1">
+            </div>
+            <div class="form-group">
+              <label>درجة الحرارة (°C)</label>
+              <input type="number" id="temperature" placeholder="0" min="0" step="0.1">
+            </div>
+          </div>
+        </div>
+
+        <!-- الإنتاج والتصدير -->
+        <div class="section">
+          <div class="section-title">💧 الإنتاج والتصدير</div>
+          <div class="grid">
+            <div class="form-group">
+              <label>السعة التشغيلية (%)</label>
+              <input type="number" id="capacity" placeholder="100" min="0" max="100" step="0.1">
+            </div>
+            <div class="form-group">
+              <label>إنتاج الشميسي (م³)</label>
+              <input type="number" id="production1" placeholder="0" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>إنتاج منفوحة (م³)</label>
+              <input type="number" id="production2" placeholder="0" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>الإنتاج الاحتياطي (م³)</label>
+              <input type="number" id="productionReserve" placeholder="0" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>تصدير الشميسي (م³)</label>
+              <input type="number" id="export1" placeholder="0" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>تصدير منفوحة (م³)</label>
+              <input type="number" id="export2" placeholder="0" min="0" step="1">
+            </div>
+          </div>
+        </div>
+
+        <!-- حالة الآبار -->
+        <div class="section">
+          <div class="section-title">🚜 حالة الآبار</div>
+          <div class="grid">
+            <div class="form-group">
+              <label>آبار في الخدمة</label>
+              <input type="number" id="wellsActive" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+              <label>آبار خارج الخدمة</label>
+              <input type="number" id="wellsInactive" placeholder="0" min="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>ملاحظات الآبار</label>
+            <textarea id="wellsNotes" rows="3" placeholder="أدخل ملاحظاتك هنا..."></textarea>
+          </div>
+        </div>
+
+        <!-- جودة المياه -->
+        <div class="section">
+          <div class="section-title">🧪 جودة المياه</div>
+          <div class="grid">
+            <div class="form-group">
+              <label>درجة الحرارة (°C)</label>
+              <input type="number" id="quality_temp" placeholder="0" step="0.1">
+            </div>
+            <div class="form-group">
+              <label>العكورة (NTU)</label>
+              <input type="number" id="turbidity" placeholder="0" step="0.1">
+            </div>
+            <div class="form-group">
+              <label>الكلور الحر (ppm)</label>
+              <input type="number" id="chlorine" placeholder="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>درجة الحموضة (pH)</label>
+              <input type="number" id="ph" placeholder="7" step="0.1" min="0" max="14">
+            </div>
+            <div class="form-group">
+              <label>التوصيلية (µS/cm)</label>
+              <input type="number" id="conductivity" placeholder="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>الأملاح الذائبة (ppm)</label>
+              <input type="number" id="tds" placeholder="0" step="1">
+            </div>
+          </div>
+        </div>
+
+        <!-- تقرير الصيانة -->
+        <div class="section">
+          <div class="section-title">🛠️ تقرير الصيانة</div>
+          <div class="table-wrapper">
+            <table id="maintenanceTable">
+              <thead>
+                <tr>
+                  <th style="width: 10%;">الحذف</th>
+                  <th style="width: 25%;">المعدة</th>
+                  <th style="width: 25%;">الموقع</th>
+                  <th style="width: 40%;">وصف العمل</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><button class="btn btn-danger" onclick="deleteRow(this)">✕</button></td>
+                  <td><input type="text" placeholder="مثل: مضخة، مرشح"></td>
+                  <td><input type="text" placeholder="الموقع"></td>
+                  <td><input type="text" placeholder="وصف العمل المنفذ"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <button class="btn btn-small" onclick="addMaintenanceRow()">+ إضافة سطر صيانة</button>
+        </div>
+
+        <!-- التوقيع -->
+        <div class="section">
+          <div class="section-title">👤 التوقيع</div>
+          <div class="grid">
+            <div class="form-group">
+              <label>معد التقرير</label>
+              <input type="text" id="reporter" placeholder="الاسم">
+            </div>
+            <div class="form-group">
+              <label>المشرف</label>
+              <input type="text" id="supervisor" placeholder="الاسم">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="footer-actions">
+        <button class="btn btn-primary" onclick="saveReport()">💾 حفظ التقرير</button>
+        <button class="btn btn-secondary" onclick="printReport()">🖨️ طباعة</button>
+        <button class="btn btn-secondary" onclick="exportReport()">📥 تصدير JSON</button>
+        <button class="btn btn-danger" onclick="clearForm()">🗑️ مسح النموذج</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Modal -->
+  <div class="modal" id="statsModal">
+    <div class="modal-content">
+      <div class="modal-header">📊 إحصائيات التقارير</div>
+      <div style="margin-bottom: 1.5rem;">
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+          إجمالي التقارير المحفوظة: <strong style="color: var(--primary); font-size: 18px;" id="statsTotal">0</strong>
+        </p>
+        <p style="color: var(--text-secondary);">
+          آخر تقرير محفوظ: <strong id="statsLast">لم يتم حفظ أي تقرير</strong>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('statsModal')">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="helpModal">
+    <div class="modal-content">
+      <div class="modal-header">❓ المساعدة والدعم</div>
+      <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.8;">
+        <p><strong>كيفية الاستخدام:</strong></p>
+        <ul style="margin: 0.5rem 0 1rem 1.5rem;">
+          <li>ملء جميع الحقول المطلوبة</li>
+          <li>إضافة بيانات الصيانة حسب الحاجة</li>
+          <li>اضغط "حفظ التقرير" لحفظ البيانات محلياً</li>
+          <li>استخدم "طباعة" للطباعة المباشرة</li>
+          <li>استخدم "تصدير JSON" لمشاركة البيانات</li>
+        </ul>
+        <p><strong>ملاحظات مهمة:</strong></p>
+        <ul style="margin: 0.5rem 0 0 1.5rem;">
+          <li>البيانات تُحفظ محلياً في المتصفح</li>
+          <li>يمكنك الوصول للتقارير السابقة من القائمة اليسرى</li>
+          <li>تأكد من حفظ البيانات قبل إغلاق الصفحة</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('helpModal')">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Database Management using localStorage
+    class ReportDatabase {
+      constructor() {
+        this.dbKey = 'haier_reports';
+        this.load();
+      }
+
+      load() {
+        const data = localStorage.getItem(this.dbKey);
+        this.reports = data ? JSON.parse(data) : [];
+      }
+
+      save() {
+        localStorage.setItem(this.dbKey, JSON.stringify(this.reports));
+      }
+
+      addReport(reportData) {
+        const report = {
+          id: Date.now(),
+          timestamp: new Date().toLocaleString('ar-SA'),
+          ...reportData
+        };
+        this.reports.unshift(report);
+        this.save();
+        return report.id;
+      }
+
+      getReport(id) {
+        return this.reports.find(r => r.id === id);
+      }
+
+      getAllReports() {
+        return this.reports;
+      }
+
+      deleteReport(id) {
+        this.reports = this.reports.filter(r => r.id !== id);
+        this.save();
+      }
+
+      deleteAll() {
+        this.reports = [];
+        this.save();
+      }
+    }
+
+    const db = new ReportDatabase();
+    let currentReportId = null;
+
+    // Initialize
+    document.getElementById('date').valueAsDate = new Date();
+    loadReportsList();
+    updateStats();
+
+    // Report Management Functions
+    function collectFormData() {
+      const maintenanceRows = [];
+      const table = document.getElementById('maintenanceTable').getElementsByTagName('tbody')[0];
+      for (let row of table.rows) {
+        const inputs = row.getElementsByTagName('input');
+        if (inputs[0].value || inputs[1].value || inputs[2].value) {
+          maintenanceRows.push({
+            equipment: inputs[0].value,
+            location: inputs[1].value,
+            description: inputs[2].value
+          });
+        }
+      }
+
+      return {
+        date: document.getElementById('date').value,
+        consumption: document.getElementById('consumption').value,
+        temperature: document.getElementById('temperature').value,
+        capacity: document.getElementById('capacity').value,
+        production1: document.getElementById('production1').value,
+        production2: document.getElementById('production2').value,
+        productionReserve: document.getElementById('productionReserve').value,
+        export1: document.getElementById('export1').value,
+        export2: document.getElementById('export2').value,
+        wellsActive: document.getElementById('wellsActive').value,
+        wellsInactive: document.getElementById('wellsInactive').value,
+        wellsNotes: document.getElementById('wellsNotes').value,
+        quality_temp: document.getElementById('quality_temp').value,
+        turbidity: document.getElementById('turbidity').value,
+        chlorine: document.getElementById('chlorine').value,
+        ph: document.getElementById('ph').value,
+        conductivity: document.getElementById('conductivity').value,
+        tds: document.getElementById('tds').value,
+        maintenance: maintenanceRows,
+        reporter: document.getElementById('reporter').value,
+        supervisor: document.getElementById('supervisor').value
+      };
+    }
+
+    function fillFormData(data) {
+      if (!data) return;
+      
+      document.getElementById('date').value = data.date || '';
+      document.getElementById('consumption').value = data.consumption || '';
+      document.getElementById('temperature').value = data.temperature || '';
+      document.getElementById('capacity').value = data.capacity || '';
+      document.getElementById('production1').value = data.production1 || '';
+      document.getElementById('production2').value = data.production2 || '';
+      document.getElementById('productionReserve').value = data.productionReserve || '';
+      document.getElementById('export1').value = data.export1 || '';
+      document.getElementById('export2').value = data.export2 || '';
+      document.getElementById('wellsActive').value = data.wellsActive || '';
+      document.getElementById('wellsInactive').value = data.wellsInactive || '';
+      document.getElementById('wellsNotes').value = data.wellsNotes || '';
+      document.getElementById('quality_temp').value = data.quality_temp || '';
+      document.getElementById('turbidity').value = data.turbidity || '';
+      document.getElementById('chlorine').value = data.chlorine || '';
+      document.getElementById('ph').value = data.ph || '';
+      document.getElementById('conductivity').value = data.conductivity || '';
+      document.getElementById('tds').value = data.tds || '';
+      document.getElementById('reporter').value = data.reporter || '';
+      document.getElementById('supervisor').value = data.supervisor || '';
+
+      // Fill maintenance table
+      const tbody = document.getElementById('maintenanceTable').getElementsByTagName('tbody')[0];
+      while (tbody.rows.length > 0) tbody.deleteRow(0);
+      
+      if (data.maintenance && Array.isArray(data.maintenance)) {
+        data.maintenance.forEach(m => {
+          const row = tbody.insertRow();
+          row.innerHTML = `
+            <td><button class="btn btn-danger" onclick="deleteRow(this)">✕</button></td>
+            <td><input type="text" value="${m.equipment}"></td>
+            <td><input type="text" value="${m.location}"></td>
+            <td><input type="text" value="${m.description}"></td>
+          `;
+        });
+      }
+    }
+
+    function saveReport() {
+      const data = collectFormData();
+      const id = db.addReport(data);
+      currentReportId = id;
+      loadReportsList();
+      updateStats();
+      showSuccessMessage('تم حفظ التقرير بنجاح ✓');
+    }
+
+    function createNewReport() {
+      if (confirm('هل تريد إنشاء تقرير جديد؟')) {
+        clearForm();
+        currentReportId = null;
+        document.getElementById('date').valueAsDate = new Date();
+      }
+    }
+
+    function loadReportsList() {
+      const list = document.getElementById('reportsList');
+      list.innerHTML = '';
+      const reports = db.getAllReports();
+      
+      reports.forEach(report => {
+        const li = document.createElement('li');
+        li.className = `report-item ${currentReportId === report.id ? 'active' : ''}`;
+        li.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span onclick="loadReport(${report.id})">${report.date || 'بدون تاريخ'}</span>
+            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteReportFromList(${report.id}, event)">✕</button>
+          </div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">${report.timestamp}</div>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function loadReport(id) {
+      const report = db.getReport(id);
+      if (report) {
+        fillFormData(report);
+        currentReportId = id;
+        loadReportsList();
+        document.querySelector('.form-container').scrollTop = 0;
+      }
+    }
+
+    function deleteReportFromList(id, event) {
+      event.stopPropagation();
+      if (confirm('هل تريد حذف هذا التقرير؟')) {
+        db.deleteReport(id);
+        if (currentReportId === id) {
+          currentReportId = null;
+          clearForm();
+        }
+        loadReportsList();
+        updateStats();
+      }
+    }
+
+    function addMaintenanceRow() {
+      const table = document.getElementById('maintenanceTable').getElementsByTagName('tbody')[0];
+      const row = table.insertRow();
+      row.innerHTML = `
+        <td><button class="btn btn-danger" onclick="deleteRow(this)">✕</button></td>
+        <td><input type="text" placeholder="مثل: مضخة، مرشح"></td>
+        <td><input type="text" placeholder="الموقع"></td>
+        <td><input type="text" placeholder="وصف العمل المنفذ"></td>
+      `;
+    }
+
+    function deleteRow(btn) {
+      const row = btn.parentNode.parentNode;
+      row.parentNode.removeChild(row);
+    }
+
+    function printReport() {
+      window.print();
+    }
+
+    function exportReport() {
+      const data = collectFormData();
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `تقرير_الحاير_${data.date || 'بدون_تاريخ'}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportAllReports() {
+      const reports = db.getAllReports();
+      if (reports.length === 0) {
+        alert('لا توجد تقارير للتصدير');
+        return;
+      }
+      const json = JSON.stringify(reports, null, 2);
+      const blob = new Blob([json], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `جميع_التقارير_${new Date().toLocaleDateString('ar-SA')}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function clearForm() {
+      if (confirm('هل أنت متأكد من رغبتك في مسح النموذج؟')) {
+        document.querySelectorAll('input, textarea').forEach(el => {
+          if (el.id !== 'date') el.value = '';
+        });
+        document.getElementById('date').valueAsDate = new Date();
+        const tbody = document.getElementById('maintenanceTable').getElementsByTagName('tbody')[0];
+        while (tbody.rows.length > 1) tbody.deleteRow(1);
+      }
+    }
+
+    function clearAllData() {
+      if (confirm('تحذير: هل تريد حذف جميع التقارير المحفوظة؟ هذا الإجراء لا يمكن التراجع عنه!')) {
+        if (confirm('تأكيد: هل أنت متأكد تماماً؟')) {
+          db.deleteAll();
+          currentReportId = null;
+          loadReportsList();
+          clearForm();
+          updateStats();
+          showSuccessMessage('تم حذف جميع البيانات');
+        }
+      }
+    }
+
+    function updateStats() {
+      const reports = db.getAllReports();
+      document.getElementById('totalReports').textContent = reports.length;
+      document.getElementById('statsTotal').textContent = reports.length;
+      if (reports.length > 0) {
+        document.getElementById('statsLast').textContent = reports[0].timestamp;
+      }
+    }
+
+    function showSuccessMessage(message) {
+      const div = document.createElement('div');
+      div.className = 'success-message';
+      div.textContent = message;
+      document.body.appendChild(div);
+      setTimeout(() => div.remove(), 3000);
+    }
+
+    function showStatsModal() {
+      updateStats();
+      document.getElementById('statsModal').classList.add('active');
+    }
+
+    function showHelpModal() {
+      document.getElementById('helpModal').classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Close modal on background click
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+      });
+    });
+  </script>
+</body>
+</html>
