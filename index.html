@@ -552,26 +552,14 @@
       💧 نظام تقارير محطة الحاير
     </div>
     <div class="navbar-menu">
+       <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="createNewReport()">+ تقرير جديد</button>
+        <ul class="report-list" id="reportsList"></ul>
+        <button class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;" onclick="exportAllReports()">📥 تصدير الكل</button>
+        <button class="btn btn-danger" style="width: 100%; margin-top: 0.5rem;" onclick="clearAllData()">🗑️ حذف الكل</button>  
       <button onclick="showStatsModal()">📊 الإحصائيات</button>
       <button onclick="showHelpModal()">❓ المساعدة</button>
     </div>
   </div>
-
-  <!-- Main Container -->
-  <div class="main-container">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="sidebar-section">
-        <div class="sidebar-title">التقارير</div>
-        <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="createNewReport()">+ تقرير جديد</button>
-        <ul class="report-list" id="reportsList"></ul>
-      </div>
-      <div class="sidebar-section">
-        <div class="sidebar-title">الإجراءات</div>
-        <button class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;" onclick="exportAllReports()">📥 تصدير الكل</button>
-        <button class="btn btn-danger" style="width: 100%; margin-top: 0.5rem;" onclick="clearAllData()">🗑️ حذف الكل</button>
-      </div>
-    </div>
 
     <!-- Content -->
     <div class="content">
