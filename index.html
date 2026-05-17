@@ -556,24 +556,10 @@
       <button onclick="exportAllReports()">📥 تصدير الكل</button>
       <button onclick="clearAllData()">🗑️ حذف الكل</button>  
       <button onclick="showStatsModal()">📊 الإحصائيات</button>
-      <button onclick="showHelpModal()">❓ المساعدة</button>
+      <div class="stat-label">التقارير المحفوظة</div>
+      <div class="stat-value" id="totalReports">0</div>
     </div>
   </div>
-
-    <!-- Content -->
-    <div class="content">
-      <div class="content-header">
-        <div>
-          <h1>تقرير جديد</h1>
-          <span id="reportStatus" class="status-badge status-draft">مسودة</span>
-        </div>
-        <div class="header-stats">
-          <div class="stat-card">
-            <div class="stat-label">التقارير المحفوظة</div>
-            <div class="stat-value" id="totalReports">0</div>
-          </div>
-        </div>
-      </div>
 
       <div class="form-container">
         <!-- البيانات العامة -->
@@ -720,10 +706,10 @@
 
       <!-- Footer Actions -->
       <div class="footer-actions">
-        <button class="btn btn-primary" onclick="saveReport()">💾 حفظ التقرير</button>
-        <button class="btn btn-secondary" onclick="printReport()">🖨️ طباعة</button>
-        <button class="btn btn-secondary" onclick="exportReport()">📥 تصدير JSON</button>
-        <button class="btn btn-danger" onclick="clearForm()">🗑️ مسح النموذج</button>
+        <button onclick="saveReport()">💾 حفظ التقرير</button>
+        <button onclick="printReport()">🖨️ طباعة</button>
+        <button onclick="exportReport()">📥 تصدير JSON</button>
+        <button onclick="clearForm()">🗑️ مسح النموذج</button>
       </div>
     </div>
   </div>
